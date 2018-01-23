@@ -70,5 +70,5 @@ workflows:
   build_and_test:
     jobs:
       - build__CONDA_PY_27
-      - build__CONDA_PY_35
-      - build__CONDA_PY_36
+#      - build__CONDA_PY_35
+#      - build__CONDA_PY_36
