@@ -11,12 +11,16 @@ RECIPE_ROOT=$FEEDSTOCK_ROOT/recipe
 docker info
 
 config=$(cat <<CONDARC
+
 channels:
  - conda-forge
  - defaults
+
 conda-build:
  root-dir: /feedstock_root/build_artefacts
+
 show_channel_urls: true
+
 CONDARC
 )
 
@@ -38,20 +42,28 @@ cat << EOF | docker run -i \
                         -e HOST_USER_ID="${HOST_USER_ID}" \
                         -e CONDA_PY="${CONDA_PY}" \
                         -a stdin -a stdout -a stderr \
-                        condaforge/linux-anvil \
-                        bash || exit 1
+                        kamasubb/conda-forge-linux-anvil-ppc64le \
+                        /bin/bash || exit 1
+
 set -e
 set +x
 export BINSTAR_TOKEN=${BINSTAR_TOKEN}
 set -x
 export PYTHONUNBUFFERED=1
+
 echo "$config" > ~/.condarc
+cat /proc/sys/fs/binfmt_misc/ppc64le || true
+export PATH=$PATH:/opt/conda/bin
 # A lock sometimes occurs with incomplete builds. The lock file is stored in build_artefacts.
 conda clean --lock
-conda install --yes --quiet conda-forge-build-setup
-source run_conda_forge_build_setup
+
+#conda install --yes --quiet conda-forge-build-setup
+#source run_conda_forge_build_setup
+
 conda build /recipe_root --quiet || exit 1
-upload_or_check_non_existence /recipe_root conda-forge --channel=main || exit 1
+#upload_or_check_non_existence /recipe_root conda-forge --channel=main || exit 1
+
+conda install --yes --quiet boto3
 touch /feedstock_root/build_artefacts/conda-forge-build-done
 EOF
 
@@ -59,3 +71,4 @@ EOF
 # see https://github.com/conda-forge/conda-smithy/pull/337
 # for a possible fix
 set -x
+test -f "$FEEDSTOCK_ROOT/build_artefacts/conda-forge-build-done" || exit 1
