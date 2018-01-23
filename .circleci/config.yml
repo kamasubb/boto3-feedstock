@@ -15,9 +15,9 @@ jobs:
             ./ci_support/checkout_merge_commit.sh
       - run:
           command: docker pull condaforge/linux-anvil
-          command: sudo docker run --rm --privileged multiarch/qemu-user-static:register
+          command: docker run --rm --privileged multiarch/qemu-user-static:register
           command: wget https://github.com/multiarch/qemu-user-static/releases/download/v2.9.1/qemu-ppc64le-static.tar.gz -O /tmp/qemu-ppc64le-static.tar.gz
-          command: tar zxvf /tmp/qemu-ppc64le-static.tar.gz -C /tmp
+          command: tar -zxvf /tmp/qemu-ppc64le-static.tar.gz -C /tmp
       - run:
           name: Print conda-build environment variables
           command: |
